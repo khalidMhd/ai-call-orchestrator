@@ -4,8 +4,8 @@ import { REDIS_HOST, REDIS_PORT } from '../utils/constants'
 
 export const connection = new IORedis({
   maxRetriesPerRequest: null,
-  host: REDIS_HOST,
-  port: REDIS_PORT,
+  host: REDIS_HOST || 'localhost',
+  port: REDIS_PORT || 6379,
 })
 
 
