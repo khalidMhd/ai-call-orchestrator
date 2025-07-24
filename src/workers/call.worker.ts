@@ -1,4 +1,4 @@
-import { Worker, JobsOptions } from 'bullmq';
+import { Worker } from 'bullmq';
 import { AppDataSource } from '../db';
 import { Call } from '../db/entities/Call';
 import { connection } from '../queues/call.queue';
@@ -24,7 +24,7 @@ const callWorker = new Worker(
         call.startedAt = new Date();
         await repo.save(call);
 
-        console.log(` Calling ${call.payload.to} (Mock ID: mock-call-id-${Date.now()})`);
+        console.log(`Calling ${call.payload.to} (Mock ID: mock-call-id-${Date.now()})`);
 
         // Simulate a delay
         await new Promise(resolve => setTimeout(resolve, 2000));
@@ -59,16 +59,16 @@ callWorker.on('failed', async (job, err) => {
     if (call.attempts >= MAX_RETRIES) {
         call.status = 'FAILED';
         call.endedAt = new Date();
-        console.warn(`❗ Max retry attempts reached for call ${call.id}`);
+        console.warn(`Max retry attempts reached for call ${call.id}`);
     } else {
-        call.status = 'PENDING'; // Will be retried automatically
+        call.status = 'PENDING'; // retried automatically
     }
 
     await repo.save(call);
 });
 
 callWorker.on('completed', async job => {
-    console.log(`✅ Job ${job.id} processed successfully`);
+    console.log(`Job ${job.id} processed successfully`);
 });
 
 
