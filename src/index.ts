@@ -13,7 +13,6 @@ const port = process.env.PORT || 3000
 async function main() {
     try {
         await connectDB()
-        // startWorker()
         const app = express()
         app.use(cors())
         // app.use(express.json())
