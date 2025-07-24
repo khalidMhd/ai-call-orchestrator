@@ -3,7 +3,6 @@ import { AppDataSource } from '../../db'
 import { Call } from '../../db/entities/Call'
 import crypto from 'crypto'
 import { CALLBACK_SECRET } from '../../utils/constants'
-import { log } from 'console'
 
 export const handleCallback = async (req: Request, res: Response) => {
   const sig = req.headers['x-signature'] as string
