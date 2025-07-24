@@ -1,7 +1,6 @@
 import 'reflect-metadata'
 import express from 'express'
 import { connectDB } from './db/connect'
-import { startWorker } from './services/worker.service'
 import callsRoutes from './routes/calls.routes'
 import metricsRoutes from './routes/metrics.routes'
 import callbackRoutes from './routes/callback.routes'
@@ -28,9 +27,9 @@ async function main() {
         app.use(callbackRoutes)
 
 
-        app.listen(port, () => console.log('🚀 Listening on', port))
+        app.listen(port, () => console.log('Listening on', port))
     } catch (err) {
-        console.error('❌ Failed to start server:', err)
+        console.error('Failed to start server:', err)
         process.exit(1)
     }
 }
