@@ -1,62 +1,108 @@
-import { Request, Response } from 'express'
-import { AppDataSource } from '../../db'
-import { Call } from '../../db/entities/Call'
-import { callQueue } from '../../queues/call.queue'
+import { Request, Response } from 'express';
+import { AppDataSource } from '../../db';
+import { Call } from '../../db/entities/Call';
+import { callQueue } from '../../queues/call.queue';
 import { MAX_RETRIES } from '../../utils/constants';
 
-const repo = () => AppDataSource.getRepository(Call)
+const repo = () => AppDataSource.getRepository(Call);
 
 export const createCall = async (req: Request, res: Response) => {
-  const { to, scriptId, metadata } = req.body
-  if (!to || !scriptId) return res.status(400).json({ error: 'required fields missing' })
+  try {
+    const { to, scriptId, metadata } = req.body;
+    if (!to || !scriptId) {
+      return res.status(400).json({ error: 'Required fields "to" and "scriptId" are missing' });
+    }
 
-  const c = repo().create({ payload: { to, scriptId, metadata }, status: 'PENDING', attempts: 0 })
-  await repo().save(c)
+    const callRepo = repo();
+    const c = callRepo.create({
+      payload: { to, scriptId, metadata },
+      status: 'PENDING',
+      attempts: 0,
+    });
+    await callRepo.save(c);
 
-  await callQueue.add('callJob', { id: c.id }, {
-    attempts: MAX_RETRIES,                 // max 3 retries
-    backoff: {             // exponential backoff starting with 5s
-      type: 'exponential',
-      delay: 5000,
-    },
-    removeOnComplete: 1000,
-    removeOnFail: 1000,
-  })
+    await callQueue.add(
+      'callJob',
+      { id: c.id },
+      {
+        attempts: MAX_RETRIES,
+        backoff: {
+          type: 'exponential',
+          delay: 5000,
+        },
+        removeOnComplete: 1000,
+        removeOnFail: 1000,
+      }
+    );
 
-  res.status(201).json(c)
-}
+    return res.status(201).json(c);
+  } catch (error) {
+    console.error('Error creating call:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
 
 export const getCall = async (req: Request, res: Response) => {
-  const c = await repo().findOneBy({ id: req.params.id })
-  if (!c) return res.status(404).json({ error: 'not found' })
-  res.json(c)
-}
+  try {
+    const callRepo = repo();
+    const c = await callRepo.findOneBy({ id: req.params.id });
+
+    if (!c) {
+      return res.status(404).json({ error: 'Call not found' });
+    }
+
+    return res.json(c);
+  } catch (error) {
+    console.error('Error fetching call:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
 
 export const updateCall = async (req: Request, res: Response) => {
-  const c = await repo().findOneBy({ id: req.params.id })
-  if (!c) return res.status(404).json({ error: 'not found' })
-  if (c.status !== 'PENDING') return res.status(400).json({ error: 'only PENDING updatable' })
+  try {
+    const callRepo = repo();
+    const c = await callRepo.findOneBy({ id: req.params.id });
 
-  const { to, scriptId, metadata } = req.body
-  if (to) c.payload.to = to
-  if (scriptId) c.payload.scriptId = scriptId
-  if (metadata) c.payload.metadata = metadata
-  await repo().save(c)
-  res.json(c)
-}
+    if (!c) {
+      return res.status(404).json({ error: 'Call not found' });
+    }
+
+    if (c.status !== 'PENDING') {
+      return res.status(400).json({ error: 'Only PENDING calls can be updated' });
+    }
+
+    const { to, scriptId, metadata } = req.body;
+    if (to) c.payload.to = to;
+    if (scriptId) c.payload.scriptId = scriptId;
+    if (metadata) c.payload.metadata = metadata;
+
+    await callRepo.save(c);
+    return res.json(c);
+  } catch (error) {
+    console.error('Error updating call:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
 
 export const listCalls = async (req: Request, res: Response) => {
-  const status = req.query.status as string
-  const page = Number(req.query.page) || 1
-  const limit = Number(req.query.limit) || 10
+  try {
+    const status = req.query.status as string;
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
 
-  const whereClause = status ? { status: status as Call['status'] } : {}
+    const whereClause = status ? { status: status as Call['status'] } : {};
+    const callRepo = repo();
 
-  const [data, total] = await repo().findAndCount({
-    where: whereClause,
-    skip: (page - 1) * limit,
-    take: limit,
-    order: { createdAt: 'DESC' },
-  })
-  res.json({ data, total, page, limit })
-}
+    const [data, total] = await callRepo.findAndCount({
+      where: whereClause,
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { createdAt: 'DESC' },
+    });
+
+    return res.json({ data, total, page, limit });
+  } catch (error) {
+    console.error('Error listing calls:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
