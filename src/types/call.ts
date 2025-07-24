@@ -1,4 +1,3 @@
-// src/types/call.ts
 import {
   Entity,
   PrimaryGeneratedColumn,
