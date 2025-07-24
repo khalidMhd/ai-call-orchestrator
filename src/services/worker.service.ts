@@ -21,7 +21,7 @@ export async function startWorker() {
       continue
     }
 
-    console.log(`📞 Picked Call ID: ${call.id} for ${call.payload.to}`)
+    console.log(`Picked Call ID: ${call.id} for ${call.payload.to}`)
     handleCall(call)
   }
 }
@@ -39,7 +39,7 @@ async function pickPending(): Promise<Call | null> {
       .andWhere('createdAt < :expiration', { expiration: expirationDate })
       .execute();
 
-    // Step 2: Pick a fresh PENDING call
+    // Step 2: get fresh PENDING call
     const c = await m
       .createQueryBuilder(Call, 'c')
       .setLock('pessimistic_write')
@@ -60,20 +60,18 @@ async function pickPending(): Promise<Call | null> {
 
 async function handleCall(call: Call) {
   try {
-    // Mocking external API response instead of real HTTP request
+    // Mocking external API
     const res = {
       data: {
-        callId: `mock-call-id-${Date.now()}`, // Fake callId
+        callId: `mock-call-id-${Date.now()}`,
       },
     }
 
     extMap.set(res.data.callId, call.id)
-    console.log(` Mock call started for ${call.payload.to}, Mock Call ID: ${res.data.callId}`)
-
-    // In real scenario, the external service will callback to /callbacks/call-status
+    console.log(`Mock call started for ${call.payload.to}, Mock Call ID: ${res.data.callId}`)
 
   } catch (e: any) {
-    console.error('❌ Call error:', e.message)
+    console.error('Call error:', e.message)
     await failOrRetry(call, e.message)
   } finally {
     sem.release()
@@ -87,10 +85,10 @@ async function failOrRetry(call: Call, err: string) {
 
   if (call.attempts >= MAX_RETRIES) {
     call.status = 'FAILED'
-    console.warn(` Call ${call.id} failed after ${call.attempts} attempts.`)
+    console.warn(`Call ${call.id} failed after ${call.attempts} attempts.`)
   } else {
     call.status = 'PENDING'
-    console.log(` Retrying Call ${call.id}, attempt #${call.attempts}`)
+    console.log(`Retrying Call ${call.id}, attempt #${call.attempts}`)
   }
 
   await repo.save(call)
