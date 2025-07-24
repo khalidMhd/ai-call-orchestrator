@@ -12,6 +12,7 @@
     "skipLibCheck": true
   },
   "exclude": [
-    "ormconfig.ts"
+    "ormconfig.ts",
+    "test"
   ]
 }
