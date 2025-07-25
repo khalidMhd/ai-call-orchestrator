@@ -68,7 +68,7 @@ export const updateCall = async (req: Request, res: Response) => {
     }
 
     if (c.status !== 'PENDING') {
-      return res.status(400).json({ error: 'Only PENDING calls can be updated' });
+      return res.status(400).json({ error: 'Only pending calls can be updated' });
     }
 
     const { to, scriptId, metadata } = req.body;
