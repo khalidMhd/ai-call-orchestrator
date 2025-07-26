@@ -14,7 +14,7 @@ AI Call Orchestrator is a Node.js-based backend system designed to manage outbou
 - Avoids duplicate in-flight calls per phone number.
 - Jobs are removed after completion or failure.
 - Receives completion status from external provider.
-- Verifies authenticity (HMAC or secret).
+- Verifies authenticity (HMAC).
 
 ### Job Lifecycle Events
 - Tracks job events: `waiting`, `active`, `completed`, `failed`, and `retried`.
@@ -60,38 +60,17 @@ AI Call Orchestrator is a Node.js-based backend system designed to manage outbou
 ```bash
 git clone https://github.com/khalidmhd/ai-call-orchestrator.git
 cd ai-call-orchestrator
-
+cp .env.example .env
 ```
 
-### 2. Create a .env file in the root
-```bash
-PORT=3000
-
-DB_HOST=127.0.0.1
-DB_PORT=5432
-DB_USERNAME=postgres
-DB_PASSWORD=root
-DB_NAME=ai_calls
-
-EXTERNAL_API_URL=https://provider.com/api/v1/calls
-CALLBACK_URL=http://localhost:3000/callbacks/call-status
-CALLBACK_SECRET=supersecret
-MAX_RETRIES=3
-MAX_IN_PROGRESS=30
-
-REDIS_HOST=127.0.0.1
-REDIS_PORT=6379
-
-```
-
-### 3. Run with Docker
+### 2. Run with Docker
 
 ```bash
 docker compose up --build
 
 ```
 
-### 4. Run Locally Without Docker
+### 3. Run Locally Without Docker
 ```bash
 # Make sure Redis and PostgreSQL are running locally
 npm install
@@ -99,7 +78,7 @@ npm run dev
 
 ```
 
-### 5. Run Database Migrations
+### 4. Run Database Migrations
 ```bash
 npm run migration:generate
 npm run migration:run
