@@ -25,11 +25,6 @@ AI Call Orchestrator is a Node.js-based backend system designed to manage outbou
 - PostgreSQL connected via TypeORM.
 - Migration support enabled.
 
-### Express API
-- `/calls` – Add and manage calls.
-- `/metrics` – Retrieve job statistics and performance metrics.
-- `/callbacks/call-status` – Receives status updates from the AI provider.
-
 ### Worker (BullMQ)
 - Background worker processes jobs in the queue.
 - Handles exponential backoff and retry strategy.
