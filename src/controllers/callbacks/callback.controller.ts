@@ -49,7 +49,6 @@ export const handleCallback = async (req: Request, res: Response) => {
 
     return res.json({ ok: true });
   } catch (error) {
-    console.error('Error handling callback:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
 };
