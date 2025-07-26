@@ -54,6 +54,15 @@ AI Call Orchestrator is a Node.js-based backend system designed to manage outbou
 
 ---
 
+## Remarks and Design Decisions
+
+1. **Why BullMQ is the right choice over Kafka in current scenario?**  
+   BullMQ is preferred because it provides built-in concurrency control and retry mechanisms that suit job orchestration out of the box. It allows faster development with minimal setup and works seamlessly with Redis and Node.js.  
+   Kafka, while powerful for high-throughput event streaming, adds unnecessary complexity and is overkill for this use case.
+
+2. **External API Call Simulation**  
+   The external AI-Call API call behavior is simulated within the codebase. The actual call to the external API is currently commented out with detailed comments explaining the expected flow and assumptions made. This helps demonstrate intended integration without depending on an external service.
+
 ## Setup Instructions
 
 ### 1. Clone the Repository
