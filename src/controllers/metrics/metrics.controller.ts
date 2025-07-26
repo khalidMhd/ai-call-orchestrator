@@ -23,7 +23,6 @@ export const getMetrics = async (req: Request, res: Response) => {
 
     return res.json(obj);
   } catch (error) {
-    console.error('Error fetching call metrics:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
 };
