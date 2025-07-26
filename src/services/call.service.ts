@@ -33,14 +33,16 @@ export class CallService {
       // Simulate call processing, replace with real logic
       await new Promise(resolve => setTimeout(resolve, 9000));
 
-      call.status = 'COMPLETED';
-      call.endedAt = new Date();
-      await callRepository.save(call);
+      // throw new Error('Simulated error during call processing'); // Simulate an error for testing
+      
+      // call.status = 'COMPLETED';
+      // call.endedAt = new Date();
+      // await callRepository.save(call);
     } catch (error) {
       console.error(`Error processing call ${callId}`);
       throw error;
     } finally {
-      // Remove phone from in-flight set no matter what to prevent blocking others
+      // Remove phone from in-flight
       await redis.srem(IN_FLIGHT_SET_KEY, phone);
     }
   }
