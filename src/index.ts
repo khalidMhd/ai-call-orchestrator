@@ -21,7 +21,7 @@ async function main() {
 
     app.use(cors())
     app.use(helmet())
-    // app.use(morgan('combined'))
+    app.use(morgan('combined'))
 
     app.use(express.json({
       verify: (req: any, res, buf) => {
