@@ -10,10 +10,11 @@ AI Call Orchestrator is a Node.js-based backend system designed to manage outbou
 - Jobs are added to a queue for asynchronous processing.
 - Each job simulates an AI phone call with a mock call ID.
 - Controls concurrency (e.g., only 30 calls handled simultaneously).
-- Retry mechanism: failed jobs are retried up to 3 times with exponential backoff.
-- Logs job failures with expiration after retries.
-- Jobs are removed after completion or failure (for cleanup).
-- Duplicate job prevention and ensures the same call ID is not queued multiple times.
+- Retries failed jobs up to 3 times with exponential backoff.
+- Avoids duplicate in-flight calls per phone number.
+- Jobs are removed after completion or failure.
+- Receives completion status from external provider.
+- Verifies authenticity (HMAC or secret).
 
 ### Job Lifecycle Events
 - Tracks job events: `waiting`, `active`, `completed`, `failed`, and `retried`.
