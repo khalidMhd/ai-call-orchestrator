@@ -14,16 +14,16 @@ export const createCall = async (req: Request, res: Response) => {
     }
 
     const callRepo = repo();
-    const c = callRepo.create({
+    const createCall = callRepo.create({
       payload: { to, scriptId, metadata },
       status: 'PENDING',
       attempts: 0,
     });
-    await callRepo.save(c);
+    await callRepo.save(createCall);
 
     await callQueue.add(
       'callJob',
-      { id: c.id },
+      { id: createCall.id, phone: createCall.payload.to },
       {
         attempts: MAX_RETRIES,
         backoff: {
@@ -35,9 +35,8 @@ export const createCall = async (req: Request, res: Response) => {
       }
     );
 
-    return res.status(201).json(c);
+    return res.status(201).json(createCall);
   } catch (error) {
-    console.error('Error creating call:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -45,13 +44,13 @@ export const createCall = async (req: Request, res: Response) => {
 export const getCall = async (req: Request, res: Response) => {
   try {
     const callRepo = repo();
-    const c = await callRepo.findOneBy({ id: req.params.id });
+    const createCall = await callRepo.findOneBy({ id: req.params.id });
 
-    if (!c) {
+    if (!createCall) {
       return res.status(404).json({ error: 'Call not found' });
     }
 
-    return res.json(c);
+    return res.json(createCall);
   } catch (error) {
     console.error('Error fetching call:', error);
     return res.status(500).json({ error: 'Internal server error' });
@@ -61,23 +60,23 @@ export const getCall = async (req: Request, res: Response) => {
 export const updateCall = async (req: Request, res: Response) => {
   try {
     const callRepo = repo();
-    const c = await callRepo.findOneBy({ id: req.params.id });
+    const createCall = await callRepo.findOneBy({ id: req.params.id });
 
-    if (!c) {
+    if (!createCall) {
       return res.status(404).json({ error: 'Call not found' });
     }
 
-    if (c.status !== 'PENDING') {
+    if (createCall.status !== 'PENDING') {
       return res.status(400).json({ error: 'Only pending calls can be updated' });
     }
 
     const { to, scriptId, metadata } = req.body;
-    if (to) c.payload.to = to;
-    if (scriptId) c.payload.scriptId = scriptId;
-    if (metadata) c.payload.metadata = metadata;
+    if (to) createCall.payload.to = to;
+    if (scriptId) createCall.payload.scriptId = scriptId;
+    if (metadata) createCall.payload.metadata = metadata;
 
-    await callRepo.save(c);
-    return res.json(c);
+    await callRepo.save(createCall);
+    return res.json(createCall);
   } catch (error) {
     console.error('Error updating call:', error);
     return res.status(500).json({ error: 'Internal server error' });

@@ -8,7 +8,7 @@ export const connection = new IORedis({
   port: REDIS_PORT || 6379,
   retryStrategy(times) {
     const delay = Math.min(times * 50, 2000);
-    return delay; // reconnect delay in ms
+    return delay;
   },
 })
 
