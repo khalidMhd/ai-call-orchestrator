@@ -1,5 +1,7 @@
 import { callRepository } from '../repositories/call.repository';
 import { redis } from '../redis/redis.client';
+import { sendCallToProvider } from '../utils/external.call.provider';
+import { CALLBACK_URL } from '../utils/constants';
 
 const IN_FLIGHT_SET_KEY = 'in_flight_phones';
 
@@ -31,10 +33,11 @@ export class CallService {
       console.log(`Processing call to ${phone}...`);
 
       // Simulate call processing, replace with real logic
-      await new Promise(resolve => setTimeout(resolve, 30000));
+      //  await sendCallToProvider(phone, CALLBACK_URL);
+      await new Promise(resolve => setTimeout(resolve, 9000));
 
       // throw new Error('Simulated error during call processing'); // Simulate an error for testing
-      
+
       // call.status = 'COMPLETED';
       // call.endedAt = new Date();
       // await callRepository.save(call);
