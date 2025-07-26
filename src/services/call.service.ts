@@ -16,7 +16,7 @@ export class CallService {
     // Check if phone is already in-flight (processing)
     const isInFlight = await redis.sismember(IN_FLIGHT_SET_KEY, phone);
     if (isInFlight) {
-      console.log(`Phone ${phone} already in flight, aborting job for call ${callId}`);
+      console.log(`Phone ${phone} already in flight, rescheduling job ID: ${callId}`);
       throw new Error(`Phone ${phone} already in flight`);
     }
 
@@ -31,7 +31,7 @@ export class CallService {
       console.log(`Processing call to ${phone}...`);
 
       // Simulate call processing, replace with real logic
-      await new Promise(resolve => setTimeout(resolve, 9000));
+      await new Promise(resolve => setTimeout(resolve, 30000));
 
       // throw new Error('Simulated error during call processing'); // Simulate an error for testing
       
