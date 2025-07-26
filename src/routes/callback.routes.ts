@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { handleCallback } from '../controllers/callbacks/callback.controller'
 
-const r = Router()
-r.post('/callbacks/call-status', handleCallback)
-export default r
+const routes = Router()
+routes.post('/callbacks/call-status', handleCallback)
+export default routes
