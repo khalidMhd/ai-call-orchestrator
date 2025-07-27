@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const createCall = async (phoneNumber: string) => {
   try {
-    const response = await axios.post('http://localhost:5000/calls', {
+    const response = await axios.post('http://localhost:3000/calls', {
       to: phoneNumber,
       scriptId: 'welcome-flow',
       metadata: { userId: 'abc123' }
