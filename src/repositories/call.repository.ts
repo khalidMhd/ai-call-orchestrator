@@ -11,4 +11,9 @@ export const callRepository = {
   save: async (call: Call) => {
     return await repo().save(call);
   },
+
+  create: async (data: Partial<Call>) => {
+    const call = repo().create(data);
+    return await repo().save(call);
+  },
 };
